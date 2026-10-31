@@ -1,0 +1,156 @@
+---
+title: "Projekt"
+output: html_document
+date: "2026-10-28"
+---
+#TO DO:
+#Skomentować dane pozbyć się/zastąpić braków/i
+#policzyć odchylenie standarowe dla wartości liczbowych oraz zliczyć zmienne kategoryczne (ile wypadków w danej kategorii) oraz zrobić summary dla nich (najlepiej jakąś funkcją to zrobić) by szukać ciekawych wyników, wyjaśnić jeśli możliwe 
+#Zrobić grafy i powybierać najciekawsze/najsensowniejsze
+#Spróbować z Accident_Severity/Weather_Conditions/Road_Type/Rode_Serfuce_Conditions na Vehicle_Type
+#Sprawdzic czy zależność między liczbą samochodów a ilościa rannych jest liniowa
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library("catboost")
+library(corrplot)
+library(ggplot2)
+library(caret)
+library(treemap)
+```
+
+```{r}
+roadcrash <- read.csv("Road_Accident_Data.csv")
+
+head(roadcrash, 10)
+
+```
+```{r}
+colSums(is.na(roadcrash))
+```
+```{r}
+colSums(roadcrash=="")
+```
+
+```{r}
+#czyszczenie danych z niepotrzebnych danych
+
+roadcrash <- roadcrash[,-1]
+```
+
+
+
+##Opis danych.
+accident.date => sezon(wiosna,lato,jesień,zima)
+Day_of_week- dane kategoryczne przyjmujące wartości od poniedziałka do niedzieli
+Junction_Control - 
+Junction_Detail-
+Accident_Severity
+Latitude-
+Light_condition- 
+Local_Authority_.District
+Carriageway_Hazards
+Longitude
+Number_of_Casualties
+Number_of_Vehicles
+Police_Force
+Road_Surface_Conditions
+Road_Type 
+Speed_limit
+Time
+Urban_or_Rural_Area
+Weather_Conditions
+Vehicle_Type
+```{r}
+summary(roadcrash)
+
+```
+```{r}
+#Grafy
+
+numericData <- sapply(roadcrash, is.numeric)
+corrplot(cor(roadcrash[, numericData], method = "pearson"), method = "color", type = "upper")
+
+
+barplot(table(roadcrash$Day_of_Week), main = "Wypadki w konkretne dni", xlab="Dni tygodnia", ylab= "Ilość")
+
+barplot(table(roadcrash$Accident_Severity))
+
+counts <- table(roadcrash$Junction_Detail)
+pct    <- round(100 * counts / sum(counts), 1)
+labels <- paste0(names(counts), " (", pct, "%)")
+
+pie(counts, labels = paste0(pct, "%"),
+    col = hcl.colors(length(counts), "Set 3"),
+    main = "Junction_Detail")
+legend("bottomright", legend = names(counts),
+       fill = hcl.colors(length(counts), "Set 3"), cex = 0.6, bty = "n")
+
+
+
+hist(table(roadcrash$Local_Authority_.District.), col = "steelblue",main = "Histogram")
+
+
+treemap(as.data.frame(table(roadcrash$Junction_Control)),
+        index = "Var1",
+        vSize = "Freq",
+        type = "index",
+        title = "Junction_Detail",
+        palette = hcl.colors(nrow(as.data.frame(table(roadcrash$Junction_Control))), "Set 3"))
+
+
+barplot(table(roadcrash$Light_Conditions), col = "steelblue",cex.names = 0.65)
+
+counts <- table(roadcrash$Urban_or_Rural_Area)
+pct    <- round(100 * counts / sum(counts), 1)
+labels <- paste0(names(counts), " (", pct, "%)")
+
+pie(counts, labels = paste0(pct, "%"),
+    col = hcl.colors(length(counts), "Set 3"),
+    main = "Urban_or_Rural_Area")
+legend("bottomright", legend = names(counts),
+       fill = hcl.colors(length(counts), "Set 3"), cex = 1.5, bty = "n")
+
+
+barplot(table(roadcrash$Number_of_Casualties), col = "steelblue",cex.names = 0.65)
+
+counts <- table(roadcrash$Weather_Conditions)
+pct    <- round(100 * counts / sum(counts), 1)
+labels <- paste0(names(counts), " (", pct, "%)")
+
+pie(counts, labels = paste0(pct, "%"),
+    col = hcl.colors(length(counts), "Set 3"),
+    cex=0.7,
+    main = "Weather_Conditions")
+legend("bottomright", legend = names(counts),
+       fill = hcl.colors(length(counts), "Set 3"),cex = 0.7, bty = "n")
+
+counts <- table(roadcrash$Road_Type)
+pct    <- round(100 * counts / sum(counts), 1)
+labels <- paste0(names(counts), " (", pct, "%)")
+
+pie(counts, labels = paste0(pct, "%"),
+    col = hcl.colors(length(counts), "Set 3"),
+    cex=0.7,
+    main = "Road_Type")
+legend("bottomright", legend = names(counts),
+       fill = hcl.colors(length(counts), "Set 3"),cex = 0.7, bty = "n")
+
+```
+
+```{r}
+#Catboost
+
+
+
+```
+crossvalidation error
+```{r}
+plot(table(roadcrash$Time))
+```
+
