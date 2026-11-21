@@ -14,6 +14,10 @@ date: "2026-10-28"
 library(ggplot2)
 ```
 
+```{r}
+library("dyplr")
+```
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
