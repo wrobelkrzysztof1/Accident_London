@@ -10,6 +10,10 @@ date: "2026-10-28"
 #Spróbować z Accident_Severity/Weather_Conditions/Road_Type/Rode_Serfuce_Conditions na Vehicle_Type
 #Sprawdzic czy zależność między liczbą samochodów a ilościa rannych jest liniowa
 
+```{r}
+library(ggplot2)
+```
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
